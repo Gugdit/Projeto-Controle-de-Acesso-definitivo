@@ -89,10 +89,12 @@ public class ControleDeAcesso {
 
     private static void exibirCadastro() {
         StringBuilder tabela = new StringBuilder();
-
+        int larguraColuna=0;
         for (int linhas = 0; linhas < matrizCadastro.length; linhas++) {
             for (int colunas = 0; colunas < matrizCadastro[0].length; colunas++) {
-                tabela.append( String.format("%s | ",matrizCadastro[linhas][colunas]));
+
+                larguraColuna = colunas ==0 ? 5 : (colunas == 2 ? 10 : 25);
+                tabela.append( String.format("%-" + larguraColuna + "s | ", matrizCadastro[linhas][colunas]));
             }
             tabela.append("\n");
         }
