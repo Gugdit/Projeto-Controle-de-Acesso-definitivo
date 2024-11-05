@@ -1,4 +1,5 @@
 import java.io.*;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class ControleDeAcesso {
@@ -9,14 +10,6 @@ public class ControleDeAcesso {
     static File bancoDeDados = new File("src\\bancoDeDados.txt");
 
     public static void main(String[] args) {
-        if (!bancoDeDados.exists()){
-            return;
-        }
-        try {
-            bancoDeDados.createNewFile();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
         carregarDadosDoArquivo();
         matrizCadastro[0] = cabecalho;
         menuPrincipal();
@@ -24,20 +17,21 @@ public class ControleDeAcesso {
 
         scanner.close();
     }
-    private static void menuPrincipal(){
+
+    private static void menuPrincipal() {
         int opcao;
         String menu;
         do {
             menu = """
-                  _____________________________________________
-                  |  Escolha uma opção:                       |
-                  |      1 - Para cadastrar um usuário        |
-                  |      2 - Para exibir o cadastro           |
-                  |      3 - Para atualizar um usuário        |
-                  |      4 - Para deletar um usuário          |
-                  |      5 - Sair                             |
-                  |___________________________________________|
-                   """;
+                    _____________________________________________
+                    |  Escolha uma opção:                       |
+                    |      1 - Para cadastrar um usuário        |
+                    |      2 - Para exibir o cadastro           |
+                    |      3 - Para atualizar um usuário        |
+                    |      4 - Para deletar um usuário          |
+                    |      5 - Sair                             |
+                    |___________________________________________|
+                    """;
             System.out.println(menu);
 
             opcao = scanner.nextInt();
@@ -72,9 +66,8 @@ public class ControleDeAcesso {
         String[][] novaMatriz = new String[qtdPessoas + matrizCadastro.length][matrizCadastro[0].length];
 
         for (int linhas = 0; linhas < matrizCadastro.length; linhas++) {
-            for (int colunas = 0; colunas < matrizCadastro[0].length; colunas++) {
-                novaMatriz[linhas][colunas] = matrizCadastro[linhas][colunas];
-            }
+                novaMatriz[linhas] = Arrays.copyOf(matrizCadastro[linhas], matrizCadastro[linhas].length);
+
         }
 
         System.out.println("Preencha os dados a seguir: ");
@@ -86,25 +79,25 @@ public class ControleDeAcesso {
                 novaMatriz[linhas][colunas] = scanner.nextLine();
             }
         }
-        matrizCadastro =  novaMatriz;
+        matrizCadastro = novaMatriz;
         salvarDadosNoArquivo();
     }
 
     private static void exibirCadastro() {
         StringBuilder tabela = new StringBuilder();
-        int larguraColuna=0;
-        for (int linhas = 0; linhas < matrizCadastro.length; linhas++) {
+        int larguraColuna;
+        for (String [] usuarioLinha : matrizCadastro) {
             for (int colunas = 0; colunas < matrizCadastro[0].length; colunas++) {
 
-                larguraColuna = colunas ==0 ? 5 : (colunas == 2 ? 10 : 25);
-                tabela.append( String.format("%-" + larguraColuna + "s | ", matrizCadastro[linhas][colunas]));
+                larguraColuna = colunas == 0 ? 5 : (colunas == 2 ? 10 : 25);
+                tabela.append(String.format("%-" + larguraColuna + "s | ", usuarioLinha[colunas]));
             }
             tabela.append("\n");
         }
         System.out.println(tabela);
     }
 
-    private static void atualizarUsuario(){
+    private static void atualizarUsuario() {
         exibirCadastro();
         System.out.print("Digite o ID do usuário que deseja atualizar:");
         int idUsuario = scanner.nextInt();
@@ -113,8 +106,8 @@ public class ControleDeAcesso {
         System.out.println("Atualize as informações a seguir:");
         System.out.println(matrizCadastro[0][0] + " - " + idUsuario);
 
-        for (int colunas = 1; colunas < matrizCadastro[0].length ; colunas++) {
-            System.out.println(matrizCadastro[0][colunas]+ ": ");
+        for (int colunas = 1; colunas < matrizCadastro[0].length; colunas++) {
+            System.out.println(matrizCadastro[0][colunas] + ": ");
             matrizCadastro[idUsuario][colunas] = scanner.nextLine();
 
         }
@@ -124,13 +117,14 @@ public class ControleDeAcesso {
 
 
     }
-    private static void deletarUsuario(){
+
+    private static void deletarUsuario() {
         exibirCadastro();
         System.out.print("Digite o id do usuário que deseja deletar:");
         int idUsuario = scanner.nextInt();
         scanner.nextLine();
 
-        String[][] novaMatriz = new String[matrizCadastro.length-1][matrizCadastro[0].length];
+        String[][] novaMatriz = new String[matrizCadastro.length - 1][matrizCadastro[0].length];
         novaMatriz[0] = cabecalho;
         for (int linhaMatrizCadastro = 1, linhaNovaM = 1; linhaMatrizCadastro < matrizCadastro.length; linhaMatrizCadastro++) {
             if (idUsuario == linhaMatrizCadastro)
@@ -144,36 +138,38 @@ public class ControleDeAcesso {
         exibirCadastro();
         salvarDadosNoArquivo();
     }
-    private static void salvarDadosNoArquivo(){
+
+    private static void salvarDadosNoArquivo() {
 
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(bancoDeDados))) {
-            for(String[] linhaMatriz : matrizCadastro){
-                bufferedWriter.write(String.join(",",linhaMatriz)+ "\n");
+            for (String[] linhaMatriz : matrizCadastro) {
+                bufferedWriter.write(String.join(",", linhaMatriz) + "\n");
             }
 
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
-    private static void carregarDadosDoArquivo(){
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(bancoDeDados))){
-            if (!bancoDeDados.exists())
-                return;
-            String linha = "", dados = "";
 
-            while ((linha = bufferedReader.readLine())!=null) {
-                dados+= linha + "\n";
+    private static void carregarDadosDoArquivo() {
+        if (!bancoDeDados.exists()) {
+            return;
+        }
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(bancoDeDados))) {
+
+            StringBuilder dados = new StringBuilder();
+            String linha;
+            while ((linha = bufferedReader.readLine()) != null) {
+                dados.append(linha).append("\n");
             }
-            String[] qtdLinhas = dados.split("\n");
-            int qtdColunas = qtdLinhas[0].split(",").length;
+            String[] linhaUsuario = dados.toString().split("\n");
 
-            matrizCadastro = new String[qtdLinhas.length][qtdColunas];
+            matrizCadastro = new String[linhaUsuario.length][linhaUsuario[0].split(",").length];
 
-            for (int linhas = 0; linhas < qtdLinhas.length; linhas++) {
-                matrizCadastro[linhas] = qtdLinhas[linhas].split(",");
+            for (int linhas = 0; linhas < matrizCadastro.length; linhas++) {
+                matrizCadastro[linhas] = linhaUsuario[linhas].split(",");
             }
-
-        }catch (Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
