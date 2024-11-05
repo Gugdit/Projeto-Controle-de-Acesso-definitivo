@@ -95,6 +95,7 @@ public class ControleDeAcesso {
                 tabela.append( String.format("%s | ",matrizCadastro[linhas][colunas]));
             }
             tabela.append("\n");
+
         }
         System.out.println(tabela);
     }
