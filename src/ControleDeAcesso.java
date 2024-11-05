@@ -9,6 +9,9 @@ public class ControleDeAcesso {
     static File bancoDeDados = new File("src\\bancoDeDados.txt");
 
     public static void main(String[] args) {
+        if (!bancoDeDados.exists()){
+            return;
+        }
         try {
             bancoDeDados.createNewFile();
         } catch (IOException e) {
