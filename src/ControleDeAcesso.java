@@ -92,11 +92,9 @@ public class ControleDeAcesso {
 
         for (int linhas = 0; linhas < matrizCadastro.length; linhas++) {
             for (int colunas = 0; colunas < matrizCadastro[0].length; colunas++) {
-                tabela.append(matrizCadastro[linhas][colunas]);
-
-                tabela += colunas == 0 ? "\t" : "\t\t\t";
+                tabela.append( String.format("%s | ",matrizCadastro[linhas][colunas]));
             }
-            tabela += "\n";
+            tabela.append("\n");
         }
         System.out.println(tabela);
     }
